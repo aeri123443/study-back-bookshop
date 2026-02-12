@@ -33,8 +33,8 @@ const login = (req, res) => {
     const {email, password} = req.body;
 
     const sql = "SELECT name, email, password FROM users WHERE email = ?"
-    const data = [email]
-    conn.query(sql, data, (err, result)=>{
+    const values = [email]
+    conn.query(sql, values, (err, result)=>{
         if (err) {
             console.log(err);
             return res.status(StatusCodes.BAD_REQUEST).end();
@@ -69,4 +69,54 @@ const login = (req, res) => {
     })
 };
 
-module.exports = {join, login};
+// 비밀번호 초기화 (요청)
+const passwordResetRequest  = (req, res) => {
+    const {email} = req.body;
+
+    const sql = "SELECT name, email FROM users WHERE email = ?";
+    const values = [email];
+    conn.query(sql, values, (err, result)=>{
+        if (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        };
+
+        const userInfo = result[0]
+        if (userInfo){
+            return res.status(StatusCodes.OK).json({
+                msg: `${userInfo.name}님, 현재 비밀번호와 새로운 비밀번호를 입력해주세요.`,
+                email: userInfo.email
+            });
+        } else {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                msg: "존재하지 않는 사용자입니다."
+            })
+        }
+    })
+};
+
+// 비밀번호 초기화
+const passwordReset  = (req, res) => {
+    const {email, password} = req.body;
+    // console.log(email, password)
+
+    const sql = "UPDATE users SET password = ? WHERE email = ?";
+    const values = [password, email];
+    conn.query(sql, values, (err, result)=>{
+        if (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        };
+        console.log(result);
+        
+        if (result.affectedRows){
+            return res.status(StatusCodes.OK).json({
+                msg: "비밀번호 변경을 완료했습니다. 다시 로그인해주세요."
+            });
+        } else {
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
+    })
+};
+
+module.exports = {join, login, passwordResetRequest, passwordReset};
