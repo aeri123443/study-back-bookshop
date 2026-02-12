@@ -1,5 +1,6 @@
 const conn = require('../mariadb');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const dotenv = require('dotenv');
 const {StatusCodes} = require('http-status-codes');
 
@@ -9,10 +10,14 @@ dotenv.config();
 const join = (req, res)=>{
     // console.log(req);
     const {email, password, name, contact} = req.body;
-    console.log(email, password, name, contact);
+    // console.log(email, password, name, contact);
 
-    const sql = "INSERT INTO users(email, name, password, contact)  VALUES (?, ?, ?, ?)";
-    const data = [email, name, password, contact];
+    // 비밀번호 암호화
+    const salt = crypto.randomBytes(8).toString('base64');
+    const hashPassword = crypto.pbkdf2Sync(password, salt, 10000, 8, 'sha512').toString('base64');
+
+    const sql = "INSERT INTO users(email, name, password, contact, salt)  VALUES (?, ?, ?, ?, ?)";
+    const data = [email, name, hashPassword, contact, salt];
     conn.query(sql, data, (err, result) => {
         if (err) {
             console.log(err);
@@ -32,7 +37,7 @@ const join = (req, res)=>{
 const login = (req, res) => {
     const {email, password} = req.body;
 
-    const sql = "SELECT name, email, password FROM users WHERE email = ?"
+    const sql = "SELECT name, email, salt, password FROM users WHERE email = ?"
     const values = [email]
     conn.query(sql, values, (err, result)=>{
         if (err) {
@@ -42,7 +47,7 @@ const login = (req, res) => {
 
         // console.log(result);
         const userInfo = result[0]
-        if (userInfo && userInfo.password == password){
+        if (userInfo && userInfo.password == crypto.pbkdf2Sync(password, userInfo.salt, 10000, 8, 'sha512').toString('base64')){
             
             const token = jwt.sign(
                 {
@@ -84,7 +89,7 @@ const passwordResetRequest  = (req, res) => {
         const userInfo = result[0]
         if (userInfo){
             return res.status(StatusCodes.OK).json({
-                msg: `${userInfo.name}님, 현재 비밀번호와 새로운 비밀번호를 입력해주세요.`,
+                msg: `${userInfo.name}님, 새로운 비밀번호를 입력해주세요.`,
                 email: userInfo.email
             });
         } else {
@@ -100,8 +105,12 @@ const passwordReset  = (req, res) => {
     const {email, password} = req.body;
     // console.log(email, password)
 
-    const sql = "UPDATE users SET password = ? WHERE email = ?";
-    const values = [password, email];
+    // 비밀번호 암호화
+    const salt = crypto.randomBytes(8).toString('base64');
+    const hashPassword = crypto.pbkdf2Sync(password, salt, 10000, 8, 'sha512').toString('base64');
+
+    const sql = "UPDATE users SET password = ?, salt = ? WHERE email = ?";
+    const values = [hashPassword, salt, email];
     conn.query(sql, values, (err, result)=>{
         if (err) {
             console.log(err);
