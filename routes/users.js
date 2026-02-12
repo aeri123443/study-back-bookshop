@@ -1,8 +1,8 @@
-const express = require('express')
-const router = express.Router()
-const conn = require('../mariadb')
-const {body, validationResult} = require('express-validator')
-const join = require('../controller/UserController')
+const express = require('express');
+const router = express.Router();
+const conn = require('../mariadb');
+const {body, validationResult} = require('express-validator');
+const {join, login} = require('../controller/UserController');
 
 router.use(express.json());
 
@@ -12,9 +12,9 @@ const validate = (req, res, next) => {
    if (err.isEmpty()){
         return next();
    } else {
-        res.status(400).json(err)
+        res.status(400).json(err);
    }
-}
+};
 
 // 회원가입
 router.post('/join', 
@@ -29,9 +29,7 @@ router.post('/join',
     )
 
 // 로그인
-router.post('/login', (req, res)=>{
-    
-})
+router.post('/login', login);
 
 // 비밀번호 초기화 (요청)
 router
