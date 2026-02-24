@@ -185,3 +185,19 @@ INSERT INTO likes (user_id, product_id) VALUES (9, 30);
 
 -- 좋아요 데이터 삭제
 DELETE FROM likes WHERE user_id=1 AND product_id = 2
+
+-- 제품의 좋아요 수를 카운트
+SELECT count(*) FROM likes WHERE product_id = 25
+SELECT *,
+(SELECT count(*) FROM likes WHERE product_id = products.id) AS likes
+FROM products
+
+-- 내가 이 제품을 좋아요 표시 했는지 확인
+SELECT EXISTS (SELECT * FROM likes WHERE user_id=1 AND product_id=2)
+
+SELECT *,
+    (SELECT count(*) FROM likes WHERE likes.product_id = products.id) AS likes,
+    (SELECT EXISTS (SELECT * FROM likes WHERE user_id = ? AND likes.product_id = ?)) AS is_liked
+FROM products
+LEFT JOIN categories ON categories.category_id = products.category_id 
+WHERE products.id = ?

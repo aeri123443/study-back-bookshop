@@ -9,7 +9,7 @@ const allProducts = (req, res) => {
     limit = parseInt(limit);
 
     // 도서 전체 조회
-    let sql = "SELECT * FROM products";
+    let sql = "SELECT *, (SELECT count(*) FROM likes WHERE product_id = products.id) AS likes FROM products";
     let values = [];
     let noDataMessage = "조회되는 도서 목록이 없습니다.";
     
@@ -57,11 +57,17 @@ const allProducts = (req, res) => {
 
 // 도서 개별 조회
 const productDetail = (req, res) => {
+    let {user_id} = req.body;
     let {productId} = req.params;
 
-    const sql = `SELECT * FROM products LEFT JOIN categories 
-                    ON products.category_id = categories.id WHERE products.id = ?;`;
-    const values = [productId]
+    const sql = `SELECT *,
+                    (SELECT count(*) FROM likes WHERE likes.product_id = products.id) AS likes,
+                    (SELECT EXISTS (SELECT * FROM likes WHERE user_id = ? AND likes.product_id = ?)) AS is_liked
+                FROM products
+                LEFT JOIN categories ON categories.category_id = products.category_id 
+                WHERE products.id = ?`;
+    const values = [user_id, productId, productId];
+
     conn.query(sql, values, (err, result)=>{
         if (err){
             console.log(err);
