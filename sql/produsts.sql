@@ -98,3 +98,10 @@ UPDATE products SET img = 8  WHERE id = 27;
 UPDATE products SET img = 70 WHERE id = 28;
 UPDATE products SET img = 24 WHERE id = 29;
 UPDATE products SET img = 61 WHERE id = 30;
+
+SELECT * FROM products LEFT JOIN
+categories ON products.category_id = categories.id
+WHERE products.id = 1;
+
+SELECT * FROM products  WHERE category_id = ? AND 
+pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 2 MONTH) AND NOW() LIMIT 6, 3

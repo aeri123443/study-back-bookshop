@@ -3,59 +3,64 @@ const {StatusCodes} = require('http-status-codes');
 
 // 도서 전체 조회
 const allProducts = (req, res) => {
-    const {category_id} = req.query;
-    // console.log(category_id)
+    let {category_id, recent, page, limit} = req.query;
+    category_id = parseInt(category_id);
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    // 도서 전체 조회
+    let sql = "SELECT * FROM products";
+    let values = [];
+    let noDataMessage = "조회되는 도서 목록이 없습니다.";
     
-    // 카테고리 별 조회
-    if (category_id) {
-        const sql = "SELECT * FROM products WHERE category_id = ?";
-        const values = [category_id]
-
-        conn.query(sql, values, (err, result)=>{
-            if (err){
-                console.log(err);
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-
-            console.log(result);
-
-            if (result[0]) {
-                res.status(StatusCodes.OK).json(result);
-            } else {
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    msg: `해당 카테고리의 도서가 존재하지 않습니다.`
-                });
-            }
-        });
+    // 카테고리 별 신간 도서 조회
+    if (category_id && recent) {
+        sql += " WHERE category_id = ? AND pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 2 MONTH) AND NOW()";
+        values.push(category_id);
     }
-    // 조건 없이 전체 조회
-    else {
-        const sql = "SELECT * FROM products";
-        conn.query(sql, (err, result)=>{
-            if (err){
-                console.log(err);
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
 
-            console.log(result);
+    // 카테고리 별 조회
+    else if (category_id) {
+        sql += " WHERE category_id = ?";
+        values.push(category_id);
+    }
 
-            if (result) {
-                res.status(StatusCodes.OK).json(result);
-            } else {
-                res.status(StatusCodes.OK).json({
-                    msg: "조회되는 도서 목록이 없습니다."
-                });
-            }
-        });
-    };
+    // 신간 조회
+    else if (recent) {
+        sql += " pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 2 MONTH) AND NOW()";
+    }
+    
+    // 페이징
+    if (page & limit){
+        const offset = limit * (page-1);
+        sql += " LIMIT ?, ?";
+        values.push(offset, limit);
+    }
+
+    conn.query(sql, values, (err, result)=>{
+        if (err){
+            console.log(err);
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+        }
+
+        console.log(result);
+
+        if (result[0]) {
+            return res.status(StatusCodes.OK).json(result);
+        } else {
+            return res.status(StatusCodes.OK).json({
+                msg: noDataMessage
+            });
+        }
+    });
 };
 
 // 도서 개별 조회
 const productDetail = (req, res) => {
     let {productId} = req.params;
-    // console.log(productId);
 
-    const sql = "SELECT * FROM products WHERE id = ?";
+    const sql = `SELECT * FROM products LEFT JOIN categories 
+                    ON products.category_id = categories.id WHERE products.id = ?;`;
     const values = [productId]
     conn.query(sql, values, (err, result)=>{
         if (err){
