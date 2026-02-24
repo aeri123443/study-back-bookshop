@@ -99,9 +99,89 @@ UPDATE products SET img = 70 WHERE id = 28;
 UPDATE products SET img = 24 WHERE id = 29;
 UPDATE products SET img = 61 WHERE id = 30;
 
+-- 특정 제품 조회 (카테고리 정보 포함)
 SELECT * FROM products LEFT JOIN
 categories ON products.category_id = categories.id
 WHERE products.id = 1;
 
+-- 특정 카테고리의 신간 조회
 SELECT * FROM products  WHERE category_id = ? AND 
 pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 2 MONTH) AND NOW() LIMIT 6, 3
+
+-- 좋아요 데이터 삽입
+INSERT INTO likes (user_id, product_id) VALUES (2, 2);
+INSERT INTO likes (user_id, product_id) VALUES (4, 4);
+INSERT INTO likes (user_id, product_id) VALUES (3, 4);
+INSERT INTO likes (user_id, product_id) VALUES (5, 5);
+INSERT INTO likes (user_id, product_id) VALUES (5, 8);
+
+INSERT INTO likes (user_id, product_id) VALUES (1, 1);
+INSERT INTO likes (user_id, product_id) VALUES (1, 3);
+INSERT INTO likes (user_id, product_id) VALUES (1, 7);
+INSERT INTO likes (user_id, product_id) VALUES (2, 5);
+INSERT INTO likes (user_id, product_id) VALUES (2, 9);
+
+INSERT INTO likes (user_id, product_id) VALUES (3, 1);
+INSERT INTO likes (user_id, product_id) VALUES (3, 6);
+INSERT INTO likes (user_id, product_id) VALUES (3, 10);
+INSERT INTO likes (user_id, product_id) VALUES (4, 2);
+INSERT INTO likes (user_id, product_id) VALUES (4, 6);
+
+INSERT INTO likes (user_id, product_id) VALUES (4, 9);
+INSERT INTO likes (user_id, product_id) VALUES (5, 1);
+INSERT INTO likes (user_id, product_id) VALUES (5, 12);
+INSERT INTO likes (user_id, product_id) VALUES (7, 3);
+INSERT INTO likes (user_id, product_id) VALUES (7, 4);
+
+INSERT INTO likes (user_id, product_id) VALUES (7, 10);
+INSERT INTO likes (user_id, product_id) VALUES (8, 2);
+INSERT INTO likes (user_id, product_id) VALUES (8, 5);
+INSERT INTO likes (user_id, product_id) VALUES (8, 11);
+INSERT INTO likes (user_id, product_id) VALUES (9, 1);
+
+INSERT INTO likes (user_id, product_id) VALUES (9, 6);
+INSERT INTO likes (user_id, product_id) VALUES (9, 8);
+INSERT INTO likes (user_id, product_id) VALUES (2, 12);
+INSERT INTO likes (user_id, product_id) VALUES (3, 15);
+INSERT INTO likes (user_id, product_id) VALUES (1, 20);
+
+INSERT INTO likes (user_id, product_id) VALUES (1, 4);
+INSERT INTO likes (user_id, product_id) VALUES (2, 4);
+INSERT INTO likes (user_id, product_id) VALUES (8, 4);
+INSERT INTO likes (user_id, product_id) VALUES (9, 4);
+
+INSERT INTO likes (user_id, product_id) VALUES (1, 6);
+INSERT INTO likes (user_id, product_id) VALUES (2, 6);
+INSERT INTO likes (user_id, product_id) VALUES (5, 6);
+INSERT INTO likes (user_id, product_id) VALUES (7, 6);
+
+INSERT INTO likes (user_id, product_id) VALUES (4, 8);
+INSERT INTO likes (user_id, product_id) VALUES (1, 8);
+
+INSERT INTO likes (user_id, product_id) VALUES (5, 9);
+INSERT INTO likes (user_id, product_id) VALUES (8, 9);
+
+INSERT INTO likes (user_id, product_id) VALUES (1, 12);
+INSERT INTO likes (user_id, product_id) VALUES (4, 12);
+INSERT INTO likes (user_id, product_id) VALUES (7, 12);
+
+INSERT INTO likes (user_id, product_id) VALUES (2, 15);
+INSERT INTO likes (user_id, product_id) VALUES (8, 15);
+INSERT INTO likes (user_id, product_id) VALUES (9, 15);
+
+INSERT INTO likes (user_id, product_id) VALUES (3, 20);
+INSERT INTO likes (user_id, product_id) VALUES (4, 20);
+INSERT INTO likes (user_id, product_id) VALUES (7, 20);
+
+INSERT INTO likes (user_id, product_id) VALUES (1, 25);
+INSERT INTO likes (user_id, product_id) VALUES (2, 25);
+INSERT INTO likes (user_id, product_id) VALUES (3, 25);
+INSERT INTO likes (user_id, product_id) VALUES (8, 25);
+
+INSERT INTO likes (user_id, product_id) VALUES (4, 30);
+INSERT INTO likes (user_id, product_id) VALUES (5, 30);
+INSERT INTO likes (user_id, product_id) VALUES (7, 30);
+INSERT INTO likes (user_id, product_id) VALUES (9, 30);
+
+-- 좋아요 데이터 삭제
+DELETE FROM likes WHERE user_id=1 AND product_id = 2
