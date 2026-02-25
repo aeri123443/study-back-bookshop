@@ -15,6 +15,6 @@ const orderRouter = require('./routes/orders.js');
 app.use("/users", userRouter);
 app.use("/products", productRouter);
 app.use("/categories", categoryRouter);
-app.use("/cart", cartRouter);
+app.use("/carts", cartRouter);
 app.use("/likes", likeRouter);
 app.use("/orders", orderRouter);
